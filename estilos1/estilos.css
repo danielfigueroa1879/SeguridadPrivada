@@ -1,0 +1,382 @@
+/* Estilos prototipo */
+body {
+    background-color: #b6d7a8;
+    /*#e5f2e3*/
+}
+
+/* Estilos para el contenedor del formulario */
+form {
+    font-family: Montserrat Semi !important;
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f1f6ed;
+    border: 1px solid #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    font-size: 20px;
+    transition: transform 0.5s ease-in-out; /* Efecto de transformación al pasar el cursor */
+}
+
+form:hover {
+    transform: translate(0, -8px); /* Mueve el formulario hacia arriba al pasar el cursor */
+}
+
+/* Estilos para el título h1 */
+h1 {
+    font-family: Montserrat Semi !important;
+    text-align: center;
+    width: 100%;
+    padding: 10px;
+    font-size: 34px;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.4); /* Agrega sombra al texto h1 */
+}
+
+/* Estilos para las etiquetas de los campos */
+label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* Estilos para los campos de entrada de texto */
+input[type="text"],
+input[type="tel"],
+input[type="time"],
+
+textarea {
+    width: 98%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #519259;
+    background-color: #ffffff; /* Cambia el color de fondo a blanco */
+    border-radius: 9px;
+    box-sizing: border-box;
+    font-size: 20px;
+    height: 40px; /*altura de la caja de respuestas */
+    font-family: Montserrat Semi !important;
+    color: #519259; /* Cambia el color del texto a VERDE oscuro */
+}
+
+/* Estilos para los marcadores de posición */
+input[type="text"]::placeholder,
+input[type="tel"]::placeholder,
+input[type="time"]::placeholder,
+textarea::placeholder {
+    color: #d6d6d4;
+    font-size: 20px;
+    font-family: Montserrat Semi !important;
+}
+
+/* Estilos para los campos de entrada de texto con foco */
+input[type="text"]:focus,
+input[type="tel"]:focus,
+input[type="time"]:focus,
+textarea:focus {
+    outline: none;
+}
+
+/* Estilos para los marcadores de posición en campos de entrada de texto con foco */
+input[type="text"]:focus::-webkit-input-placeholder,
+input[type="tel"]:focus::-webkit-input-placeholder,
+input[type="time"]:focus::-webkit-input-placeholder,
+textarea:focus::-webkit-input-placeholder {
+    color: #d6d6d4;
+    font-family: Montserrat Semi !important;
+}
+
+/* Estilos para el botón de enviar */
+input[type="submit"] {
+    background-color: #096624;
+    color: white;
+    padding: 10px 28px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.3);
+    display: block;
+    margin: 0 auto;
+    font-size: 22px;
+    font-family: Montserrat Semi !important;
+}
+
+input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* Estilos para el cuadro de selección */
+select {
+    width: 50%;
+    padding: 6px;
+    margin-bottom: 10px;
+    border: 1px solid #519259;
+    background-color: #ffffff; /* Cambia el color de fondo a blanco */
+    border-radius: 9px;
+    box-sizing: border-box;
+    font-size: 20px;
+    height: 40px; /*altura de la caja de respuestas */
+    font-family: Montserrat Semi !important;
+    color: #519259; /* Cambia el color del texto a VERDE oscuro */
+}
+
+
+/* Estilos para el logo */
+.logo {
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+    transition: transform 0.5s ease-in-out; /* Efecto de transformación al pasar el cursor */
+}
+
+.logo:hover {
+    transform: translate(0, -8px); /* Mueve el formulario hacia arriba al pasar el cursor */
+}
+
+/* Estilos para el campo de fecha */
+#fecha {
+    width: 50%; /*ancho de la caja de respuestas*/
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #519259;
+    border-radius: 9px;
+    box-sizing: border-box;
+    height: 40px;  /*altura de la caja de respuestas */
+    background-color: #ffffff; /* Cambia el color de fondo a blanco */
+    color: #519259; /* Cambia el color del texto a VERDE oscuro */
+    font-size: 20px;
+    font-family: Montserrat Semi !important;
+    
+}
+#hora {
+    width: 50%; /* Ancho al 100% del contenedor */
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #519259;
+    border-radius: 9px;
+    box-sizing: border-box;
+    height: 40px;/*altura de la caja de respuestas */
+    background-color: #ffffff; /* Cambia el color de fondo a blanco */
+    color: #519259; /* Cambia el color del texto a gris oscuro */
+    font-size: 20px;
+    font-family: Montserrat Semi !important;
+    
+}
+
+/* Estilos para el campo de descripción de la inobservancia de seguridad privada */
+textarea#text {
+    width: 100%; /* Ancho al 100% del contenedor */
+    min-height: 300px; /* Altura mínima para mostrar varias líneas de texto */
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 2px solid #519259;
+    background-color: #ffffff;
+    border-radius: 18px;
+    box-sizing: border-box;
+    font-size: 20px;
+    color: #519259;
+    font-family: Montserrat Semi !important;
+    overflow-y: scroll; /* Habilita el desplazamiento vertical si el contenido es largo */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Estilos para pantallas grandes (como computadoras) */
+@media screen and (max-width: 1024px) {
+    
+body {
+    background-color: #e5f2e3;
+    background-size: 650%;
+    
+}
+
+/* Estilos para el contenedor del formulario */
+form {
+    font-family: Montserrat Semi !important;
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f1f6ed;
+    border: 2px solid #ffffff;
+    border-radius: 13px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    font-size: 42px;
+    transition: transform 0.5s ease-in-out; /* Efecto de transformación al pasar el cursor */
+}
+
+form:hover {
+    transform: translate(0, -8px); /* Mueve el formulario hacia arriba al pasar el cursor */
+}
+
+/* Estilos para el título h1 */
+h1 {
+    font-family: Montserrat Semi !important;
+    text-align: center;
+    width: 100%;
+    padding: 15px;
+    font-size: 80px;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.4); /* Agrega sombra al texto h1 */
+}
+
+/* Estilos para las etiquetas de los campos */
+label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* Estilos para los campos de entrada de texto */
+input[type="text"],
+input[type="tel"],
+input[type="time"],
+
+textarea {
+    width: 97%;
+    padding: 55px;
+    margin-bottom: 34px;
+    border: 1px solid #519259;
+    border-radius: 18px;
+    box-sizing: border-box;
+    font-size: 46px;
+    height: 10px;
+    color: #519259;
+    font-family: Montserrat Semi !important;
+}
+
+/* Estilos para los marcadores de posición */
+input[type="text"]::placeholder,
+input[type="tel"]::placeholder,
+input[type="time"]::placeholder,
+textarea::placeholder {
+    color: #d6d6d4;
+    font-size: 44px;
+    font-family: Montserrat Semi !important;
+}
+
+/* Estilos para los campos de entrada de texto con foco */
+input[type="text"]:focus,
+input[type="tel"]:focus,
+input[type="time"]:focus,
+textarea:focus {
+    outline: none;
+}
+
+/* Estilos para los marcadores de posición en campos de entrada de texto con foco */
+input[type="text"]:focus::-webkit-input-placeholder,
+input[type="tel"]:focus::-webkit-input-placeholder,
+input[type="time"]:focus::-webkit-input-placeholder,
+textarea:focus::-webkit-input-placeholder {
+    color: #d6d6d4;
+    font-family: Montserrat Semi !important;
+}
+
+/* Estilos para el botón de enviar */
+input[type="submit"] {
+    background-color: #096624;
+    color: white;
+    padding: 30px 70px;
+    border: none;
+    border-radius: 18px;
+    cursor: pointer;
+    box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.5);
+    display: block;
+    margin: 0 auto;
+    font-size: 48px;
+    font-family: Montserrat Semi !important;
+}
+
+input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* Estilos para el cuadro de selección */
+select {
+    width: 97%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 2px solid #519259;
+    background-color: #ffffff; /* Cambia el color de fondo a blanco */
+    border-radius: 18px;
+    box-sizing: border-box;
+    font-size: 44px;
+    color: #519259;
+    height:120px; /*altura de la caja*/
+    font-family: Montserrat Semi !important;
+}
+
+
+/* Estilos para el logo */
+.logo {
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+    max-width: 900px;
+    border-radius: 8px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+    transition: transform 0.5s ease-in-out; /* Efecto de transformación al pasar el cursor */
+}
+
+.logo:hover {
+    transform: translate(0, -8px); /* Mueve el formulario hacia arriba al pasar el cursor */
+}
+
+/* Estilos para el campo de fecha */
+#fecha {
+    width: 50%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 2px solid #519259;
+    border-radius: 18px;
+    box-sizing: border-box;
+    height: 110px;/*altura de la caja*/
+    background-color: #ffffff; /* Cambia el color de fondo a blanco */
+    color: #519259; /* Cambia el color del texto  */
+    font-size: 42px;
+    font-family: Montserrat Semi !important;
+    
+}
+
+#hora {
+    width: 50%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 2px solid #519259;
+    background-color: #ffffff; /* Cambia el color de fondo a blanco */
+    border-radius: 18px;
+    box-sizing: border-box;
+    font-size: 44px;
+    color: #519259;
+    height:120px; /*altura de la caja*/
+    font-family: Montserrat Semi !important;
+    
+    
+}
+
+/* Estilos para el campo de descripción de la inobservancia de seguridad privada */
+textarea#text {
+    width: 100%; /* Ancho al 100% del contenedor */
+    min-height: 300px; /* Altura mínima para mostrar varias líneas de texto */
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 2px solid #519259;
+    background-color: #ffffff;
+    border-radius: 18px;
+    box-sizing: border-box;
+    font-size: 44px;
+    color: #519259;
+    font-family: Montserrat Semi !important;
+    overflow-y: scroll; /* Habilita el desplazamiento vertical si el contenido es largo */
+}
+
+
+}

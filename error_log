@@ -1,0 +1,21 @@
+[19-Sep-2023 16:26:56 America/New_York] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/drhrquzi/public_html/login.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/drhrquzi/public_html/login.php on line 6
+[29-Sep-2023 09:59:08 America/New_York] PHP Warning:  Invalid argument supplied for foreach() in /home/drhrquzi/public_html/prototipo.php on line 32
+[29-Sep-2023 09:59:11 America/New_York] PHP Warning:  Invalid argument supplied for foreach() in /home/drhrquzi/public_html/prototipo.php on line 32
+[29-Sep-2023 09:59:31 America/New_York] PHP Warning:  Invalid argument supplied for foreach() in /home/drhrquzi/public_html/prototipo.php on line 29
+[29-Sep-2023 09:59:36 America/New_York] PHP Warning:  Invalid argument supplied for foreach() in /home/drhrquzi/public_html/prototipo.php on line 29
+[29-Sep-2023 10:29:45 America/New_York] PHP Warning:  Invalid argument supplied for foreach() in /home/drhrquzi/public_html/prototipo.php on line 29
+[29-Sep-2023 10:32:28 America/New_York] PHP Warning:  Invalid argument supplied for foreach() in /home/drhrquzi/public_html/prototipo.php on line 29
+[29-Sep-2023 10:42:20 America/New_York] PHP Warning:  Invalid argument supplied for foreach() in /home/drhrquzi/public_html/prototipo.php on line 29
+[29-Sep-2023 10:44:44 America/New_York] PHP Warning:  Invalid argument supplied for foreach() in /home/drhrquzi/public_html/prototipo.php on line 29
+[29-Sep-2023 10:49:05 America/New_York] PHP Warning:  Invalid argument supplied for foreach() in /home/drhrquzi/public_html/prototipo.php on line 29
+[29-Sep-2023 11:23:37 America/New_York] PHP Warning:  implode(): Invalid arguments passed in /home/drhrquzi/public_html/prototipo.php on line 29
+[29-Sep-2023 11:23:41 America/New_York] PHP Warning:  implode(): Invalid arguments passed in /home/drhrquzi/public_html/prototipo.php on line 29
+[29-Sep-2023 12:17:11 America/New_York] PHP Parse error:  syntax error, unexpected end of file in /home/drhrquzi/public_html/prototipo.php on line 211
+[29-Sep-2023 12:17:18 America/New_York] PHP Parse error:  syntax error, unexpected end of file in /home/drhrquzi/public_html/prototipo.php on line 211
+[29-Sep-2023 12:17:28 America/New_York] PHP Parse error:  syntax error, unexpected end of file in /home/drhrquzi/public_html/prototipo.php on line 211
+[29-Sep-2023 12:17:31 America/New_York] PHP Parse error:  syntax error, unexpected end of file in /home/drhrquzi/public_html/prototipo.php on line 211
+[29-Sep-2023 12:17:36 America/New_York] PHP Parse error:  syntax error, unexpected end of file in /home/drhrquzi/public_html/prototipo.php on line 211
+[29-Sep-2023 12:18:11 America/New_York] PHP Parse error:  syntax error, unexpected end of file in /home/drhrquzi/public_html/prototipo.php on line 210

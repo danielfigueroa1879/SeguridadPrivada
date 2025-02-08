@@ -1,0 +1,244 @@
+/* Estilos login e Incripcción */
+body {
+    font-family: Montserrat Semi !important;
+    background-color: #e5f2e3;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    background-image: url('../imagen/101.jpg');
+    background-size: cover; /* Ajusta la imagen para cubrir todo el fondo */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
+    background-attachment: fixed; /* Fija la imagen de fondo, evitando que se desplace con el contenido */
+}
+
+/* Estilos para el encabezado */
+header {
+    border-bottom: 7px solid #eee;
+    padding: 20px 0;
+    margin-bottom: 10px;
+    width: 100%;
+    text-align: center;
+}
+
+header a {
+    text-decoration: none;
+    color: hsl(0, 4%, 18%);
+}
+
+/* Estilos para el formulario */
+form {
+    width: 40%; /* Ahora el formulario ocupará la mitad de la pantalla en dispositivos móviles */
+    text-align: center;
+    margin: 05% auto 10px auto;
+    background-color: #f1f6ed;
+    padding: 40px; /* Aumenta el espacio interior del formulario para pantallas pequeñas */
+    border-radius: 20px;
+    box-shadow: 2px 2px 20px #364a39;
+    transition: transform 0.3s ease-in-out;
+    height: 290px; /* Altura de la caja GENERAL de texto */
+    max-width: 350px; /* Ajusta el ancho caja texto según tu preferencia */
+    font-family: 'Montserrat Semi Bold', sans-serif;
+}
+
+form:hover {
+    transform: translate(0, -35px);
+}
+
+/* Estilos para los campos de entrada de texto */
+input[type="text"],
+input[type="password"],
+textarea {
+    width: 90%;
+    padding: 08px; /* Aumenta el espacio interior de los campos de entrada */
+    margin-bottom: 20px;
+    border-radius: 10px;
+    border: 3px solid #d7d7d7;
+    font-size:14px;
+    height: 35px; /* Altura de la caja de texto de respuesta. */
+    font-family: 'Montserrat Semi Bold', sans-serif;
+    
+}
+input[type="text"]::placeholder,
+input[type="password"]::placeholder,
+textarea::placeholder {
+    color: #d6d6d4; /* Cambia el color del marcador de posición a gris claro */
+    font-size: 20px; /* Cambia el tamaño de la fuente del marcador de posición */
+}
+/* Estilos para el botón de inicio de sesión */
+input[type="submit"] {
+    width: 100%;
+    background-color: #519259;
+    color: white;
+    padding: 20px; /* Aumenta el espacio interior del botón para hacerlo más grande */
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+/* Estilos para el título principal */
+h1 {
+    font-family: Montserrat Semi !important;
+    color: #fff;
+    text-align: center;
+    margin: 70px auto;
+    width: 100%;
+    font-size: 40px; /* Tamaño de fuente predeterminado */
+    text-shadow: 2px 2px 20px rgba(10, 15, 12, 0.8); /* Agrega una sombra blanca al texto */
+}
+
+/* Estilos para el enlace */
+a {
+    font-size: 20px; /* Cambia el tamaño de fuente para el enlace "Registrarte" */
+    text-decoration: none;
+    transition: transform 0.6s;
+    margin: 20px; /* Agrega margen inferior para separar el enlace del formulario */
+}
+
+a:hover {
+    transform: scale(1.7);
+}
+
+/* Estilos para el elemento 'span' */
+span {
+    width: 40%; /* Ahora el elemento span ocupará la mitad de la pantalla en dispositivos móviles */
+    margin: 20% auto; /* Ajusta el margen superior e inferior para pantallas pequeñas */
+    background-color: #ffff;
+    padding: 40px; /* Aumenta el espacio interior del elemento span para pantallas pequeñas */
+    border-radius: 18px;
+    box-shadow: 2px 2px 29px rgba(0, 0, 0, 0.9);
+    transition: transform 0.3s ease-in-out;
+}
+
+span:hover {
+    transform: translate(0, -60px);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Estilos para pantallas pequeñas (como teléfonos) */
+@media screen and (max-width: 768px) {
+    
+    h1 {
+        font-size: 100px; /* Tamaño de fuente más grande para pantallas pequeñas */
+    }
+    h2 {
+        font-size: 23px; /* Tamaño de fuente más pequeño para pantallas pequeñas
+    */
+    }
+    
+    .info {
+        font-size: 8px; 
+    }
+    icon img {
+        font-size: 8px;
+    }
+
+    /* Agrega otros estilos específicos para pantallas pequeñas aquí */
+}
+
+
+
+
+
+
+
+
+/* Estilos para pantallas grandes (como computadoras) */
+@media screen and (max-width: 1024px) {
+    
+    a {
+    font-size: 60px; /* Cambia el tamaño de fuente para el enlace "Registrarte" */
+    transition: transform 0.6s;
+    margin: 32px; /* Agrega margen inferior para separar el enlace del formulario */
+}
+
+a:hover {
+    transform: scale(1.7);
+}
+    input[type="submit"] {
+    width: 100%;
+    background-color: #519259;
+    color: white;
+    padding: 20px; /* Aumenta el espacio interior del botón para hacerlo más grande */
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 50px;
+}
+    span {
+    width: 80%; /* Ahora el elemento span ocupará la mitad de la pantalla en dispositivos móviles */
+    margin: 20% auto; /* Ajusta el margen superior e inferior para pantallas pequeñas */
+}
+    form {
+    width: 70%; /* Ahora el formulario ocupará la mitad de la pantalla en dispositivos móviles */
+    text-align: center;
+    margin: 25% auto 10px auto;
+    background-color: #f1f6ed;
+    padding: 60px; /* Aumenta el espacio interior del formulario para pantallas pequeñas */
+    border-radius: 40px;
+    box-shadow: 2px 2px 20px #364a39;
+    transition: transform 0.3s ease-in-out;
+    height: 600px; /* Altura de la caja GENERAL de texto */
+    max-width: 100%; /* Ajusta el ancho caja texto según tu preferencia */
+    font-family: 'Montserrat Semi Bold', sans-serif;
+}
+input[type="text"],
+input[type="password"],
+    textarea {
+    width: 87%;
+    padding: 28px; /* Aumenta el espacio interior de los campos de entrada */
+    margin-bottom: 15px;
+    border-radius: 30px;
+    border: 2px solid #65ab6d;
+    font-size: 45px;
+    height: 60px; /* Altura de la caja de texto de respuesta. */
+    font-family: 'Montserrat Semi Bold', sans-serif;
+    
+}
+
+input[type="text"]::placeholder,
+input[type="password"]::placeholder,
+textarea::placeholder {
+    color: #d6d6d4; /* Cambia el color del marcador de posición a gris claro */
+    font-size: 50px; /* Cambia el tamaño de la fuente del marcador de posición */
+}
+
+/* Estilos para el enlace */
+a {
+    font-size: 40px; /* Cambia el tamaño de fuente para el enlace "Registrarte" */
+    color: #519259;
+    transition: transform 0.6s;
+    margin: 20px; /* Agrega margen inferior para separar el enlace del formulario */
+}
+
+a:hover {
+    transform: scale(1.7);
+}
+    h1 {
+        font-size: 118px; /* Tamaño de fuente predeterminado para pantallas grandes */
+    }
+    h2 {
+        font-size: 23px; /* Tamaño de fuente más pequeño para pantallas grandes
+    */
+    }
+    
+    .info {
+        font-size: 8px; 
+    }
+    icon img {
+        font-size: 8px;
+    }
+
+    /* Agrega otros estilos específicos para pantallas grandes aquí */
+}

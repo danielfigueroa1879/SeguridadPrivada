@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OS10 FISCALIZACIÓN</title>
+<meta name="description" content="Descripción de tu sitio web">
+<link rel="stylesheet" href="estilos1/styleIndex.css">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="icon" type="image/png" href="/os.png">
+
+
+</head>
+<body>
+    <h1>BIENVENIDOS<br><br>PROTOTIPO DE UN SISTEMA WEB PARA LA FISCALIZACIÓN
+    <br>EN MATERIAS DE SEGURIDAD PRIVADA.</h1>
+   
+  
+    <section class="info-section">
+        <div class="info">
+            <h3 class="margen-especial-izquierda">Iniciar Sesión</h3><br>
+            <a href="login.php">AQUÍ</a>
+            <div class="icon">
+                <img src="imagen/os10.png" alt="Icono 1">
+            </div>
+        </div>
+        
+        <div class="info">
+            <h3 class="margen-especial">Inscríbete</h3><br>
+            <a href="inscripcion.php">AQUÍ</a>
+            <div class="icon">
+            <img src="imagen/capa.png" alt="Icono 2">
+         </div>
+        </div>
+        
+        
+        
+    </section>
+    
+    <!-- Contenedor para los enlaces en la esquina inferior izquierda -->
+    
+    </div>
+    <div class="bottom-left">
+        
+        <a href="https://www.credly.com/badges/7b9279e9-dd01-4ce0-b11f-2027dfaf55ad/public_url">Diplomados</a>
+        <a href="https://www.linkedin.com/in/danielfigueroach/">Linkedin</a>
+        <a href="https://wa.me/qr/KQFJFHZLQRHXE1">Whatsapp</a>
+        
+    </div>
+    <div class="credly-badge">
+        <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="7b9279e9-dd01-4ce0-b11f-2027dfaf55ad" data-share-badge-host="https://www.credly.com"></div>
+        <script type="text/javascript" async src="//cdn.credly.com/assets/utilities/embed.js"></script>
+    </div>
+    
+
+    
+    
+    
+    
+    
+</body>
+</html>
