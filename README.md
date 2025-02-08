@@ -1,2 +1,0 @@
-# SeguridadPrivada
-Seguridad Privada page
