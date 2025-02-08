@@ -15,7 +15,7 @@
     </div>
 <?php endif; ?>
 
-<form action="procesar_restablecer_contrasena.php" method="POST">
+<form action="procesar_restablecer_contrasena.html" method="POST">
     <input name="email" type="text" placeholder="Ingresa tu correo electrónico">
     <input type="submit" value="Enviar correo de restablecimiento">
 </form>
