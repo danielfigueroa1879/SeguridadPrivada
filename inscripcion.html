@@ -1,4 +1,4 @@
-<?php
+<?html
 require 'database.php';
 
 $message = '';
@@ -20,7 +20,7 @@ if (!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['conf
             if ($stmt->execute()) {
                 $message = '!!! Excelente Nuevo Usuario Creado !!! Ahora Inicia Sesi贸n 鉁岋笍馃槑馃憤';
                 // Redirigir al usuario a la p谩gina de inicio de sesi贸n despu茅s de mostrar el mensaje
-                echo '<script>alert("' . $message . '"); window.location.href = "login.php";</script>';
+                echo '<script>alert("' . $message . '"); window.location.href = "login.html";</script>';
                 exit; // Aseg煤rate de salir del script para evitar que se siga ejecutando
             } else {
                 $message = 'Lo siento, no se pudo crear tu cuenta';
@@ -44,16 +44,16 @@ if (!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['conf
 <body>
 
 <h1>REGISTRO</h1>
-<span> <a href="login.php">INICIAR SESIÓN</a></span>
+<span> <a href="login.html">INICIAR SESIÓN</a></span>
 
-<?php if (!empty($message)): ?>
+<?html if (!empty($message)): ?>
     <script>
         alert("<?= $message ?>");
-        window.location.href = "login.php"; // Redirigir inmediatamente despu茅s de mostrar el mensaje
+        window.location.href = "login.html"; // Redirigir inmediatamente despu茅s de mostrar el mensaje
     </script>
-<?php endif; ?>
+<?html endif; ?>
 
-<form action="inscripcion.php" method="POST">
+<form action="inscripcion.html" method="POST">
     <input name="email" type="text" placeholder="Ingresa tu nombre de usuario">
     <input name="password" type="password" placeholder="Ingresa tu Password">
     <input name="confir_password" type="password" placeholder="Confirma tu Password">
