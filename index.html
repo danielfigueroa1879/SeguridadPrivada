@@ -6,6 +6,7 @@
     <title>OS10 Fiscalización</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module">
+        // Importaciones de Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -13,7 +14,7 @@
         
         setLogLevel('debug');
 
-        // Firestore and Auth setup
+        // Configuración de Firebase (se adapta al entorno de producción o de desarrollo)
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         
@@ -22,11 +23,12 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             try {
+                // Inicializar Firebase
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
                 
-                // Sign in with custom token or anonymously
+                // Autenticación inicial (para obtener un ID de usuario persistente en el entorno de prueba)
                 const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
@@ -34,7 +36,7 @@
                     await signInAnonymously(auth);
                 }
 
-                // Auth state listener
+                // Listener de cambios de autenticación
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         userId = user.uid;
@@ -50,6 +52,7 @@
                     }
                 });
 
+                // Event Listeners para formularios
                 document.getElementById('login-form').addEventListener('submit', handleLogin);
                 document.getElementById('register-form').addEventListener('submit', handleRegister);
                 document.getElementById('forgot-password-form').addEventListener('submit', handleForgotPassword);
@@ -61,7 +64,7 @@
                 displayMessage('Hubo un error al inicializar la aplicación. Inténtalo de nuevo más tarde.', 'error');
             }
 
-            // Navigation
+            // Navegación entre vistas
             document.getElementById('show-login').addEventListener('click', () => showView('login-view'));
             document.getElementById('show-register').addEventListener('click', () => showView('register-view'));
             document.getElementById('show-forgot-password').addEventListener('click', () => showView('forgot-password-view'));
@@ -70,13 +73,14 @@
             showView('login-view');
         });
 
+        // Funciones de utilidad para el UI
         function showView(viewId) {
             const views = ['login-view', 'register-view', 'forgot-password-view', 'fiscalizacion-view'];
             views.forEach(id => {
                 document.getElementById(id).classList.add('hidden');
             });
             document.getElementById(viewId).classList.remove('hidden');
-            displayMessage(''); // Clear messages on view change
+            displayMessage(''); // Limpiar mensajes al cambiar de vista
         }
 
         function displayMessage(message, type = 'info') {
@@ -92,6 +96,42 @@
             }
         }
 
+        // --- Lógica de Autenticación de Prueba (antes de conectarse a Firebase) ---
+        // Descomenta el código de abajo y comenta el código de Firebase para usar la versión de prueba
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = e.target.email.value;
+            const password = e.target.password.value;
+            
+            // Simulación de inicio de sesión de prueba
+            if (email === 'test@test.com') {
+                displayMessage('Inicio de sesión de prueba exitoso.', 'success');
+                // Simular un ID de usuario para la versión de prueba
+                userId = "test-user-id";
+                document.getElementById('user-id-display').innerText = `ID de Usuario: ${userId}`;
+                document.getElementById('logged-out-view').classList.add('hidden');
+                document.getElementById('logged-in-view').classList.remove('hidden');
+                loadFiscalizaciones();
+                showView('fiscalizacion-view');
+            } else {
+                displayMessage('Error al iniciar sesión. Usa "test@test.com" para el modo de prueba.', 'error');
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            displayMessage('La funcionalidad de registro está deshabilitada en el modo de prueba. Por favor, inicia sesión con "test@test.com" y cualquier contraseña.', 'info');
+        }
+
+        async function handleForgotPassword(e) {
+            e.preventDefault();
+            displayMessage('La funcionalidad de restablecimiento de contraseña está deshabilitada en el modo de prueba.', 'info');
+        }
+
+        // --- Fin de la Lógica de Autenticación de Prueba ---
+
+        // --- Lógica de Autenticación de Firebase (Comentar el código de arriba y descomentar este para usar) ---
+        /*
         async function handleLogin(e) {
             e.preventDefault();
             const email = e.target.email.value;
@@ -102,7 +142,7 @@
                 showView('fiscalizacion-view');
             } catch (error) {
                 console.error("Error al iniciar sesión:", error);
-                displayMessage('Error al iniciar sesión. Por favor, asegúrate de que tu correo y contraseña sean correctos. También ten en cuenta que la funcionalidad de autenticación de correo y contraseña puede estar limitada en este entorno. Puedes crear una cuenta y verificar si el error persiste.', 'error');
+                displayMessage('Error al iniciar sesión. Por favor, asegúrate de que tu correo y contraseña sean correctos.', 'error');
             }
         }
 
@@ -116,14 +156,11 @@
                 displayMessage('Las contraseñas no coinciden.', 'error');
                 return;
             }
-
-            // Password strength validation from the original code
             const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@#$%^&+=!])[A-Za-z\d@#$%^&+=!]{8,}$/;
             if (!passwordRegex.test(password)) {
                 displayMessage('La contraseña debe contener al menos una letra, un número y un carácter especial (@#$%^&+=!), y tener una longitud de al menos 8 caracteres.', 'error');
                 return;
             }
-
             try {
                 await createUserWithEmailAndPassword(auth, email, password);
                 displayMessage('¡Excelente! Usuario creado. Ahora inicia sesión.', 'success');
@@ -145,7 +182,10 @@
                 displayMessage('Error al enviar el correo de restablecimiento. Verifica que el correo sea válido.', 'error');
             }
         }
+        */
+        // --- Fin de la Lógica de Autenticación de Firebase ---
 
+        // Función para guardar datos de fiscalización en Firestore
         async function handleFiscalizacionSubmit(e) {
             e.preventDefault();
             const form = e.target;
@@ -185,6 +225,7 @@
             }
         }
 
+        // Función para cargar fiscalizaciones desde Firestore
         async function loadFiscalizaciones() {
             const fiscalizacionesContainer = document.getElementById('fiscalizaciones-container');
             fiscalizacionesContainer.innerHTML = 'Cargando fiscalizaciones...';
@@ -218,6 +259,7 @@
             }
         }
 
+        // Función para cerrar sesión
         function handleLogout() {
             auth.signOut();
             displayMessage('Has cerrado sesión.', 'info');
@@ -261,10 +303,10 @@
                     <form id="login-form" class="space-y-4">
                         <h3 class="text-xl font-semibold text-center text-blue-700">Iniciar Sesión</h3>
                         <div>
-                            <input name="email" type="email" placeholder="Correo Electrónico" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <input name="email" type="email" placeholder="Correo Electrónico (prueba: test@test.com)" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                         </div>
                         <div>
-                            <input name="password" type="password" placeholder="Contraseña" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <input name="password" type="password" placeholder="Contraseña (cualquiera)" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                         </div>
                         <button type="submit" class="w-full p-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition-colors">Iniciar Sesión</button>
                     </form>
