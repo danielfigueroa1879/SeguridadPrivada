@@ -23,34 +23,40 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                // Inicializar Firebase
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                
-                // Autenticación inicial (para obtener un ID de usuario persistente en el entorno de prueba)
-                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                // Listener de cambios de autenticación
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        document.getElementById('user-id-display').innerText = `ID de Usuario: ${userId}`;
-                        document.getElementById('logged-out-view').classList.add('hidden');
-                        document.getElementById('logged-in-view').classList.remove('hidden');
-                        loadFiscalizaciones();
+                // Asegúrate de que firebaseConfig no esté vacío antes de inicializar la aplicación
+                if (Object.keys(firebaseConfig).length > 0) {
+                    app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    auth = getAuth(app);
+                    
+                    // Autenticación inicial (para obtener un ID de usuario persistente en el entorno de prueba)
+                    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
                     } else {
-                        userId = null;
-                        document.getElementById('user-id-display').innerText = '';
-                        document.getElementById('logged-out-view').classList.remove('hidden');
-                        document.getElementById('logged-in-view').classList.add('hidden');
+                        await signInAnonymously(auth);
                     }
-                });
+
+                    // Listener de cambios de autenticación
+                    onAuthStateChanged(auth, async (user) => {
+                        if (user) {
+                            userId = user.uid;
+                            document.getElementById('user-id-display').innerText = `ID de Usuario: ${userId}`;
+                            document.getElementById('logged-out-view').classList.add('hidden');
+                            document.getElementById('logged-in-view').classList.remove('hidden');
+                            loadFiscalizaciones();
+                        } else {
+                            userId = null;
+                            document.getElementById('user-id-display').innerText = '';
+                            document.getElementById('logged-out-view').classList.remove('hidden');
+                            document.getElementById('logged-in-view').classList.add('hidden');
+                        }
+                    });
+
+                } else {
+                    console.error("Firebase config is missing.");
+                    displayMessage('Error: La configuración de Firebase no está disponible. Inténtalo de nuevo más tarde.', 'error');
+                }
 
                 // Event Listeners para formularios
                 document.getElementById('login-form').addEventListener('submit', handleLogin);
@@ -59,40 +65,48 @@
                 document.getElementById('fiscalizacion-form').addEventListener('submit', handleFiscalizacionSubmit);
                 document.getElementById('logout-button').addEventListener('click', handleLogout);
 
+                // Navegación entre vistas
+                document.getElementById('show-login').addEventListener('click', () => showView('login-view'));
+                document.getElementById('show-register').addEventListener('click', () => showView('register-view'));
+                document.getElementById('show-forgot-password').addEventListener('click', () => showView('forgot-password-view'));
+                document.getElementById('show-fiscalizacion').addEventListener('click', () => showView('fiscalizacion-view'));
+
+                showView('login-view');
+
             } catch (error) {
-                console.error("Error al inicializar Firebase:", error);
+                console.error("Error al inicializar la aplicación:", error);
                 displayMessage('Hubo un error al inicializar la aplicación. Inténtalo de nuevo más tarde.', 'error');
             }
-
-            // Navegación entre vistas
-            document.getElementById('show-login').addEventListener('click', () => showView('login-view'));
-            document.getElementById('show-register').addEventListener('click', () => showView('register-view'));
-            document.getElementById('show-forgot-password').addEventListener('click', () => showView('forgot-password-view'));
-            document.getElementById('show-fiscalizacion').addEventListener('click', () => showView('fiscalizacion-view'));
-
-            showView('login-view');
         });
 
         // Funciones de utilidad para el UI
         function showView(viewId) {
             const views = ['login-view', 'register-view', 'forgot-password-view', 'fiscalizacion-view'];
             views.forEach(id => {
-                document.getElementById(id).classList.add('hidden');
+                const element = document.getElementById(id);
+                if (element) {
+                    element.classList.add('hidden');
+                }
             });
-            document.getElementById(viewId).classList.remove('hidden');
+            const element = document.getElementById(viewId);
+            if (element) {
+                element.classList.remove('hidden');
+            }
             displayMessage(''); // Limpiar mensajes al cambiar de vista
         }
 
         function displayMessage(message, type = 'info') {
             const messageElement = document.getElementById('message');
-            messageElement.innerText = message;
-            messageElement.classList.remove('text-red-500', 'text-green-500', 'text-blue-500');
-            if (type === 'error') {
-                messageElement.classList.add('text-red-500');
-            } else if (type === 'success') {
-                messageElement.classList.add('text-green-500');
-            } else {
-                messageElement.classList.add('text-blue-500');
+            if (messageElement) {
+                messageElement.innerText = message;
+                messageElement.classList.remove('text-red-500', 'text-green-500', 'text-blue-500');
+                if (type === 'error') {
+                    messageElement.classList.add('text-red-500');
+                } else if (type === 'success') {
+                    messageElement.classList.add('text-green-500');
+                } else {
+                    messageElement.classList.add('text-blue-500');
+                }
             }
         }
 
