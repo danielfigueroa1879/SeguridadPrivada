@@ -1,62 +1,394 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OS10 FISCALIZACIÓN</title>
-<meta name="description" content="Descripción de tu sitio web">
-<link rel="stylesheet" href="estilos1/styleIndex.css">
-<link rel="icon" href="favicon.ico" type="image/x-icon">
-<link rel="icon" type="image/png" href="/os.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OS10 Fiscalización</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        setLogLevel('debug');
 
+        // Firestore and Auth setup
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        
+        let app, db, auth;
+        let userId = null;
 
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                // Sign in with custom token or anonymously
+                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                // Auth state listener
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        document.getElementById('user-id-display').innerText = `ID de Usuario: ${userId}`;
+                        document.getElementById('logged-out-view').classList.add('hidden');
+                        document.getElementById('logged-in-view').classList.remove('hidden');
+                        loadFiscalizaciones();
+                    } else {
+                        userId = null;
+                        document.getElementById('user-id-display').innerText = '';
+                        document.getElementById('logged-out-view').classList.remove('hidden');
+                        document.getElementById('logged-in-view').classList.add('hidden');
+                    }
+                });
+
+                document.getElementById('login-form').addEventListener('submit', handleLogin);
+                document.getElementById('register-form').addEventListener('submit', handleRegister);
+                document.getElementById('forgot-password-form').addEventListener('submit', handleForgotPassword);
+                document.getElementById('fiscalizacion-form').addEventListener('submit', handleFiscalizacionSubmit);
+                document.getElementById('logout-button').addEventListener('click', handleLogout);
+
+            } catch (error) {
+                console.error("Error al inicializar Firebase:", error);
+                displayMessage('Hubo un error al inicializar la aplicación. Inténtalo de nuevo más tarde.', 'error');
+            }
+
+            // Navigation
+            document.getElementById('show-login').addEventListener('click', () => showView('login-view'));
+            document.getElementById('show-register').addEventListener('click', () => showView('register-view'));
+            document.getElementById('show-forgot-password').addEventListener('click', () => showView('forgot-password-view'));
+            document.getElementById('show-fiscalizacion').addEventListener('click', () => showView('fiscalizacion-view'));
+
+            showView('login-view');
+        });
+
+        function showView(viewId) {
+            const views = ['login-view', 'register-view', 'forgot-password-view', 'fiscalizacion-view'];
+            views.forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(viewId).classList.remove('hidden');
+            displayMessage(''); // Clear messages on view change
+        }
+
+        function displayMessage(message, type = 'info') {
+            const messageElement = document.getElementById('message');
+            messageElement.innerText = message;
+            messageElement.classList.remove('text-red-500', 'text-green-500', 'text-blue-500');
+            if (type === 'error') {
+                messageElement.classList.add('text-red-500');
+            } else if (type === 'success') {
+                messageElement.classList.add('text-green-500');
+            } else {
+                messageElement.classList.add('text-blue-500');
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = e.target.email.value;
+            const password = e.target.password.value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                displayMessage('Inicio de sesión exitoso.', 'success');
+                showView('fiscalizacion-view');
+            } catch (error) {
+                console.error("Error al iniciar sesión:", error);
+                displayMessage('Error al iniciar sesión. Verifica tu correo y contraseña.', 'error');
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const email = e.target.email.value;
+            const password = e.target.password.value;
+            const confirmPassword = e.target.confirm_password.value;
+            
+            if (password !== confirmPassword) {
+                displayMessage('Las contraseñas no coinciden.', 'error');
+                return;
+            }
+
+            // Password strength validation from the original code
+            const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@#$%^&+=!])[A-Za-z\d@#$%^&+=!]{8,}$/;
+            if (!passwordRegex.test(password)) {
+                displayMessage('La contraseña debe contener al menos una letra, un número y un carácter especial (@#$%^&+=!), y tener una longitud de al menos 8 caracteres.', 'error');
+                return;
+            }
+
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                displayMessage('¡Excelente! Usuario creado. Ahora inicia sesión.', 'success');
+                showView('login-view');
+            } catch (error) {
+                console.error("Error al registrar:", error);
+                displayMessage('Lo siento, no se pudo crear tu cuenta. El correo ya puede estar en uso.', 'error');
+            }
+        }
+
+        async function handleForgotPassword(e) {
+            e.preventDefault();
+            const email = e.target.email.value;
+            try {
+                await sendPasswordResetEmail(auth, email);
+                displayMessage('Se ha enviado un correo de restablecimiento de contraseña a tu dirección.', 'success');
+            } catch (error) {
+                console.error("Error al restablecer la contraseña:", error);
+                displayMessage('Error al enviar el correo de restablecimiento. Verifica que el correo sea válido.', 'error');
+            }
+        }
+
+        async function handleFiscalizacionSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                fecha: form.fecha.value,
+                hora: form.hora.value,
+                grado: form.grado.value,
+                nombre: form.nombre.value,
+                telefono: form.fono.value,
+                cuadrante: form.cuadrante.value,
+                comisaria: form.comisaria.value,
+                lugar: form.lugar.value,
+                agente: form.agente.value,
+                rol: form.rol.value,
+                razon: form.razon.value,
+                rut: form.rut.value,
+                representante: form.representante.value,
+                rutRep: form.rutRep.value,
+                direccion: form.direccion.value,
+                comuna: form.comuna.value,
+                infraccion: form.infraccion.value,
+                descripcion: form.descripccion.value,
+                userId: userId,
+                timestamp: new Date()
+            };
+
+            const fiscalizacionesCollectionRef = collection(db, `/artifacts/${appId}/public/data/fiscalizaciones`);
+
+            try {
+                const docRef = await addDoc(fiscalizacionesCollectionRef, data);
+                displayMessage('¡Datos de fiscalización guardados correctamente!', 'success');
+                form.reset();
+                loadFiscalizaciones();
+            } catch (error) {
+                console.error("Error al guardar datos de fiscalización:", error);
+                displayMessage('Error al guardar los datos. Inténtalo de nuevo más tarde.', 'error');
+            }
+        }
+
+        async function loadFiscalizaciones() {
+            const fiscalizacionesContainer = document.getElementById('fiscalizaciones-container');
+            fiscalizacionesContainer.innerHTML = 'Cargando fiscalizaciones...';
+
+            const q = query(collection(db, `/artifacts/${appId}/public/data/fiscalizaciones`));
+            
+            try {
+                const querySnapshot = await getDocs(q);
+                let html = '<h2 class="text-2xl font-bold mb-4">Fiscalizaciones Recientes</h2>';
+                html += '<ul class="space-y-4">';
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const formattedDate = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : 'N/A';
+                    html += `
+                        <li class="p-4 bg-gray-100 rounded-lg shadow-sm">
+                            <p><strong>Fecha:</strong> ${formattedDate}</p>
+                            <p><strong>Lugar:</strong> ${data.lugar}</p>
+                            <p><strong>Agente:</strong> ${data.agente}</p>
+                            <p><strong>Infracción:</strong> ${data.infraccion}</p>
+                            <p><strong>Descripción:</strong> ${data.descripcion}</p>
+                            <p class="text-xs text-gray-500 mt-2">ID de Documento: ${doc.id}</p>
+                            <p class="text-xs text-gray-500">ID de Usuario: ${data.userId}</p>
+                        </li>
+                    `;
+                });
+                html += '</ul>';
+                fiscalizacionesContainer.innerHTML = html;
+            } catch (error) {
+                console.error("Error al cargar fiscalizaciones:", error);
+                fiscalizacionesContainer.innerHTML = 'Error al cargar las fiscalizaciones.';
+            }
+        }
+
+        function handleLogout() {
+            auth.signOut();
+            displayMessage('Has cerrado sesión.', 'info');
+            showView('login-view');
+        }
+    </script>
+    <style>
+        .bottom-left {
+            position: fixed;
+            bottom: 1rem;
+            left: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+        .bottom-left a {
+            color: white;
+            text-decoration: none;
+            background-color: #3b82f6;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+        }
+    </style>
 </head>
-<body>
-    <h1>BIENVENIDOS<br><br>PROTOTIPO DE UN SISTEMA WEB PARA LA FISCALIZACIÓN
-    <br>EN MATERIAS DE SEGURIDAD PRIVADA.</h1>
-   
-  
-    <section class="info-section">
-        <div class="info">
-            <h3 class="margen-especial-izquierda">Iniciar Sesión</h3><br>
-            <a href="login.html">AQUÍ</a>
-            <div class="icon">
-                <img src="imagen/os10.png" alt="Icono 1">
-            </div>
-        </div>
-        
-        <div class="info">
-            <h3 class="margen-especial">Inscríbete</h3><br>
-            <a href="inscripcion.html">AQUÍ</a>
-            <div class="icon">
-            <img src="imagen/capa.png" alt="Icono 2">
-         </div>
-        </div>
-        
-        
-        
-    </section>
-    
-    <!-- Contenedor para los enlaces en la esquina inferior izquierda -->
-    
-    </div>
-    <div class="bottom-left">
-        
-        <a href="https://www.credly.com/badges/7b9279e9-dd01-4ce0-b11f-2027dfaf55ad/public_url">Diplomados</a>
-        <a href="https://www.linkedin.com/in/danieleliasfigueroachacama/">Linkedin</a>
-        <a href="https://wa.me/qr/KQFJFHZLQRHXE1">Whatsapp</a>
-        
-    </div>
-    <div class="credly-badge">
-        <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="7b9279e9-dd01-4ce0-b11f-2027dfaf55ad" data-share-badge-host="https://www.credly.com"></div>
-        <script type="text/javascript" async src="//cdn.credly.com/assets/utilities/embed.js"></script>
-    </div>
-    
+<body class="bg-gray-50 text-gray-900 font-sans antialiased flex flex-col items-center justify-center p-4">
+    <div class="max-w-4xl w-full mx-auto bg-white p-8 rounded-xl shadow-lg">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-blue-800 tracking-tight">OS10 FISCALIZACIÓN</h1>
+            <p class="mt-2 text-lg text-gray-600">PROTOTIPO DE UN SISTEMA WEB PARA LA FISCALIZACIÓN EN MATERIAS DE SEGURIDAD PRIVADA.</p>
+            <div id="user-id-display" class="mt-4 text-sm text-gray-500"></div>
+        </header>
 
-    
-    
-    
-    
-    
+        <!-- Main Content Area -->
+        <main class="mt-8">
+            <div id="logged-out-view" class="space-y-6">
+                <div class="text-center">
+                    <h2 class="text-2xl font-bold">Bienvenido</h2>
+                    <p class="mt-2 text-gray-600">Por favor, inicia sesión para continuar o regístrate si no tienes una cuenta.</p>
+                </div>
+
+                <div id="login-view" class="hidden">
+                    <form id="login-form" class="space-y-4">
+                        <h3 class="text-xl font-semibold text-center text-blue-700">Iniciar Sesión</h3>
+                        <div>
+                            <input name="email" type="email" placeholder="Correo Electrónico" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <input name="password" type="password" placeholder="Contraseña" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <button type="submit" class="w-full p-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition-colors">Iniciar Sesión</button>
+                    </form>
+                    <div class="text-center mt-4 text-sm">
+                        <a href="#" id="show-register" class="text-blue-600 hover:underline">¿No tienes una cuenta? Regístrate</a> | 
+                        <a href="#" id="show-forgot-password" class="text-blue-600 hover:underline">¿Olvidaste tu contraseña?</a>
+                    </div>
+                </div>
+
+                <div id="register-view" class="hidden">
+                    <form id="register-form" class="space-y-4">
+                        <h3 class="text-xl font-semibold text-center text-blue-700">Regístrate</h3>
+                        <div>
+                            <input name="email" type="email" placeholder="Correo Electrónico" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <input name="password" type="password" placeholder="Contraseña" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <input name="confirm_password" type="password" placeholder="Confirma tu Contraseña" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <button type="submit" class="w-full p-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition-colors">Registrar</button>
+                    </form>
+                    <div class="text-center mt-4 text-sm">
+                        <a href="#" id="show-login" class="text-blue-600 hover:underline">¿Ya tienes una cuenta? Inicia sesión</a>
+                    </div>
+                </div>
+
+                <div id="forgot-password-view" class="hidden">
+                    <form id="forgot-password-form" class="space-y-4">
+                        <h3 class="text-xl font-semibold text-center text-blue-700">Restablecer Contraseña</h3>
+                        <div>
+                            <input name="email" type="email" placeholder="Ingresa tu correo electrónico" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <button type="submit" class="w-full p-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition-colors">Enviar correo de restablecimiento</button>
+                    </form>
+                    <div class="text-center mt-4 text-sm">
+                        <a href="#" id="show-login" class="text-blue-600 hover:underline">Volver a iniciar sesión</a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="logged-in-view" class="hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-blue-800">Panel de Fiscalización</h2>
+                    <button id="logout-button" class="px-4 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition-colors">Cerrar Sesión</button>
+                </div>
+                
+                <div class="mb-6 text-center">
+                    <h3 class="text-xl font-semibold text-blue-700">Formulario de Fiscalización</h3>
+                    <form id="fiscalizacion-form" class="space-y-4 mt-4">
+                        <input type="date" id="fecha" name="fecha" class="w-full p-2 border rounded-lg" required>
+                        <input type="time" id="hora" name="hora" class="w-full p-2 border rounded-lg" required>
+                        <input type="text" id="grado" name="grado" placeholder="Grado" class="w-full p-2 border rounded-lg" required>
+                        <input type="text" id="nombre" name="nombre" placeholder="Nombre completo" class="w-full p-2 border rounded-lg" required>
+                        <input type="tel" id="fono" name="fono" placeholder="Teléfono" class="w-full p-2 border rounded-lg" required>
+                        <input type="text" id="cuadrante" name="cuadrante" placeholder="Cuadrante" class="w-full p-2 border rounded-lg" required>
+                        <select id="comisaria" name="comisaria" class="w-full p-2 border rounded-lg" required>
+                            <option value="">-Seleccionar Comisaría</option>
+                            <option value="1ra. Comisaria la Serena">1ra. Comisaria La Serena</option>
+                            <option value="Subcomisaria La Florida">Subcomisaria La Florida</option>
+                            <option value="Tenencia Paihuano">Tenencia Paihuano</option>
+                            <option value="5ta. Comisaria Vicuña">5ta. Comisaria Vicuña</option>
+                            <option value="Reten El Molle">Reten El Molle</option>
+                            <option value="Tenencia Juntas del Toro">Tenencia Juntas del Toro</option>
+                            <option value="2da. Comisaria Coquimbo">2da. Comisaria Coquimbo</option>
+                            <option value="Subcomisaria Tierras Blancas">Subcomisaria Tierras Blancas</option>
+                            <option value="Reten Peñuelas">Reten Peñuelas</option>
+                            <option value="Tenencia Andacollo">Tenencia Andacollo</option>
+                        </select>
+                        <input type="text" id="lugar" name="lugar" placeholder="Lugar de la Fiscalización" class="w-full p-2 border rounded-lg" required>
+                        <input type="text" id="agente" name="agente" placeholder="Nombre del agente de seguridad" class="w-full p-2 border rounded-lg" required>
+                        <input type="text" id="rol" name="rol" placeholder="R.U.T. del agente" class="w-full p-2 border rounded-lg" required>
+                        <input type="text" id="razon" name="razon" placeholder="Razón Social de la empresa" class="w-full p-2 border rounded-lg" required>
+                        <input type="text" id="rut" name="rut" placeholder="R.U.T. de la empresa" class="w-full p-2 border rounded-lg" required>
+                        <input type="text" id="representante" name="representante" placeholder="Representante Legal" class="w-full p-2 border rounded-lg" required>
+                        <input type="text" id="rutRep" name="rutRep" placeholder="R.U.T. del representante legal" class="w-full p-2 border rounded-lg" required>
+                        <input type="text" id="direccion" name="direccion" placeholder="Dirección del servicio" class="w-full p-2 border rounded-lg" required>
+                        <select id="comuna" name="comuna" class="w-full p-2 border rounded-lg" required>
+                            <option value="">-Seleccionar Comuna</option>
+                            <option value="LA SERENA">LA SERENA</option>
+                            <option value="COQUIMBO">COQUIMBO</option>
+                            <option value="TONGOY">TONGOY</option>
+                            <option value="ANDACOLLO">ANDACOLLO</option>
+                            <option value="PAIHUANO">PAIHUANO</option>
+                            <option value="VICUÑA">VICUÑA</option>
+                        </select>
+                        <select id="infraccion" name="infraccion" class="w-full p-2 border rounded-lg" required>
+                            <option value="">-Seleccionar Infracción</option>
+                            <option value="GG.SS. Sin curso (art. 13 D.S. 93)">Guardia de Seguridad (GG.SS.) Sin curso de guardia (art. 13 D.S. 93)</option>
+                            <option value="GG.SS. Sin directiva (art. 15 D.S. 93)">GG.SS. Sin directiva de funcionamiento (art. 15 D.S. 93)</option>
+                            <option value="GG.SS. Sin credencial (art. 18 D.S. 93)">GG.SS. Sin credencial (art. 18 D.S. 93)</option>
+                            <option value="GG.SS. Sin uniforme (art. octavo D/E 867)">GG.SS. Sin uniforme reglamentario (art. octavo D/E 867)</option>
+                            <option value="Guardia usa implementos NO autorizados art. 14 D. 93">Guardia de Seguridad, Nochero, Portero o Rondín, que porta o usa implementos de seguridad no autorizados por Carabineros de Chile (bastón, esposas, perros, etc.)(art. 14 D. 93)</option>
+                            <option value="No da cumplimiento a la directiva (art. 15. D.93)">GG.SS. No da cumplimiento a la directiva</option>
+                            <option value="Vigilante Privado que No da cumplimiento al plan">VV.PP. (Vigilante Privado) No da cumplimiento al plan de seguridad (D.L.3.607)</option>
+                            <option value="No da cumplimiento al plan de seguridad (Ley 19.303)">Entidad obligada que no da cumplimiento a las medidas de seguridad (ley 19.303)</option>
+                            <option value="No da cumplimiento a las medias de seguridad (ley 19.303)"> Establecimiento de venta de combustible al público o entidad obligada, que no da cumplimiento a las medidas de seguridad aprobadas por la Prefectura de Carabineros(ley 19.303)</option>
+                            <option value="No dan informacion solicitada por Carabineros de Chile de las medias de seguridad (Art. 9 ley 19.303)">Establecimiento de venta de combustible o entidad obligada, que no proporciona las informaciones pertinentes que les sean requeridas por Carabineros de Chile, sobre las medidas de seguridad aprobadas.(Art. 9 ley 19.303)</option>
+                            <option value="vigilante sin credencial">Vigilante privado (VV.PP.)sin credencial vigente (art. 13 D. 1773)</option>
+                            <option value="vigilante privado no conoce los sistema de seguridad (art. 6 inc 2 del 1122)">Vigilante privado sin conocer los sistemas de seguridad de la entidad. (art. 6-2°, D 1.122.)</option>
+                            <option value="vigilante privado de civil, sin autorizacion art. 4 Decreto ley N 3.607">Vigilante privado vistiendo de civil, sin autorización de carabineros.(art. 4, Decreto ley N° 3.607,)</option>
+                            <option value="Sin vigilante privado, (art. 3, del Decreto ley N°3.607)">No contar con vigilante privado. (art. 3, del Decreto ley N°3.607,)</option>
+                            <option value="Vigilante Privado sin armamento (art. 1, inc. 2 D. 3.607)">Vigilante privado desarrollando servicio sin portar su arma de fuego. (art. 1°, inc. 2° D. 3.607,)</option>
+                        </select>
+                        <textarea id="descripccion" name="descripccion" rows="4" placeholder="Descripción de la Inobservancia" class="w-full p-2 border rounded-lg" required></textarea>
+                        <button type="submit" class="w-full p-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition-colors">Enviar Fiscalización</button>
+                    </form>
+                </div>
+                
+                <div id="fiscalizaciones-container" class="mt-8">
+                    <!-- Fiscalizaciones will be loaded here -->
+                </div>
+            </div>
+        </main>
+
+        <div id="message" class="text-center mt-4 font-semibold"></div>
+
+    </div>
+
+    <footer class="bottom-left">
+        <a href="https://www.credly.com/badges/7b9279e9-dd01-4ce0-b11f-2027dfaf55ad/public_url" target="_blank">Diplomados</a>
+        <a href="https://www.linkedin.com/in/danieleliasfigueroachacama/" target="_blank">Linkedin</a>
+        <a href="https://wa.me/qr/KQFJFHZLQRHXE1" target="_blank">Whatsapp</a>
+    </footer>
 </body>
 </html>
