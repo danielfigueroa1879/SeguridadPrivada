@@ -23,13 +23,13 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                // Asegúrate de que firebaseConfig no esté vacío antes de inicializar la aplicación
+                // Verificar si la configuración de Firebase está presente
                 if (Object.keys(firebaseConfig).length > 0) {
                     app = initializeApp(firebaseConfig);
                     db = getFirestore(app);
                     auth = getAuth(app);
                     
-                    // Autenticación inicial (para obtener un ID de usuario persistente en el entorno de prueba)
+                    // Autenticación inicial
                     const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
                     if (initialAuthToken) {
                         await signInWithCustomToken(auth, initialAuthToken);
@@ -52,10 +52,9 @@
                             document.getElementById('logged-in-view').classList.add('hidden');
                         }
                     });
-
                 } else {
-                    console.error("Firebase config is missing.");
-                    displayMessage('Error: La configuración de Firebase no está disponible. Inténtalo de nuevo más tarde.', 'error');
+                    console.error("Firebase config is missing. Running in demo mode.");
+                    displayMessage('Error: La configuración de Firebase no está disponible. Ejecutando en modo de prueba.', 'error');
                 }
 
                 // Event Listeners para formularios
@@ -110,17 +109,13 @@
             }
         }
 
-        // --- Lógica de Autenticación de Prueba (antes de conectarse a Firebase) ---
-        // Descomenta el código de abajo y comenta el código de Firebase para usar la versión de prueba
+        // --- Lógica de Autenticación de Prueba ---
         async function handleLogin(e) {
             e.preventDefault();
             const email = e.target.email.value;
-            const password = e.target.password.value;
             
-            // Simulación de inicio de sesión de prueba
             if (email === 'test@test.com') {
                 displayMessage('Inicio de sesión de prueba exitoso.', 'success');
-                // Simular un ID de usuario para la versión de prueba
                 userId = "test-user-id";
                 document.getElementById('user-id-display').innerText = `ID de Usuario: ${userId}`;
                 document.getElementById('logged-out-view').classList.add('hidden');
@@ -142,9 +137,7 @@
             displayMessage('La funcionalidad de restablecimiento de contraseña está deshabilitada en el modo de prueba.', 'info');
         }
 
-        // --- Fin de la Lógica de Autenticación de Prueba ---
-
-        // --- Lógica de Autenticación de Firebase (Comentar el código de arriba y descomentar este para usar) ---
+        // --- Lógica de Firebase (descomentar y comentar la lógica de prueba para usarla) ---
         /*
         async function handleLogin(e) {
             e.preventDefault();
@@ -197,7 +190,6 @@
             }
         }
         */
-        // --- Fin de la Lógica de Autenticación de Firebase ---
 
         // Función para guardar datos de fiscalización en Firestore
         async function handleFiscalizacionSubmit(e) {
@@ -226,16 +218,21 @@
                 timestamp: new Date()
             };
 
-            const fiscalizacionesCollectionRef = collection(db, `/artifacts/${appId}/public/data/fiscalizaciones`);
-
-            try {
-                const docRef = await addDoc(fiscalizacionesCollectionRef, data);
-                displayMessage('¡Datos de fiscalización guardados correctamente!', 'success');
+            // Solo intentar guardar en Firestore si la base de datos está inicializada
+            if (db) {
+                try {
+                    const fiscalizacionesCollectionRef = collection(db, `/artifacts/${appId}/public/data/fiscalizaciones`);
+                    const docRef = await addDoc(fiscalizacionesCollectionRef, data);
+                    displayMessage('¡Datos de fiscalización guardados correctamente!', 'success');
+                    form.reset();
+                    loadFiscalizaciones();
+                } catch (error) {
+                    console.error("Error al guardar datos de fiscalización:", error);
+                    displayMessage('Error al guardar los datos. Inténtalo de nuevo más tarde.', 'error');
+                }
+            } else {
+                displayMessage('¡Datos de fiscalización guardados en modo de prueba! Conéctate a Firebase para persistir los datos.', 'success');
                 form.reset();
-                loadFiscalizaciones();
-            } catch (error) {
-                console.error("Error al guardar datos de fiscalización:", error);
-                displayMessage('Error al guardar los datos. Inténtalo de nuevo más tarde.', 'error');
             }
         }
 
@@ -244,38 +241,43 @@
             const fiscalizacionesContainer = document.getElementById('fiscalizaciones-container');
             fiscalizacionesContainer.innerHTML = 'Cargando fiscalizaciones...';
 
-            const q = query(collection(db, `/artifacts/${appId}/public/data/fiscalizaciones`));
-            
-            try {
-                const querySnapshot = await getDocs(q);
-                let html = '<h2 class="text-2xl font-bold mb-4">Fiscalizaciones Recientes</h2>';
-                html += '<ul class="space-y-4">';
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const formattedDate = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : 'N/A';
-                    html += `
-                        <li class="p-4 bg-gray-100 rounded-lg shadow-sm">
-                            <p><strong>Fecha:</strong> ${formattedDate}</p>
-                            <p><strong>Lugar:</strong> ${data.lugar}</p>
-                            <p><strong>Agente:</strong> ${data.agente}</p>
-                            <p><strong>Infracción:</strong> ${data.infraccion}</p>
-                            <p><strong>Descripción:</strong> ${data.descripcion}</p>
-                            <p class="text-xs text-gray-500 mt-2">ID de Documento: ${doc.id}</p>
-                            <p class="text-xs text-gray-500">ID de Usuario: ${data.userId}</p>
-                        </li>
-                    `;
-                });
-                html += '</ul>';
-                fiscalizacionesContainer.innerHTML = html;
-            } catch (error) {
-                console.error("Error al cargar fiscalizaciones:", error);
-                fiscalizacionesContainer.innerHTML = 'Error al cargar las fiscalizaciones.';
+            if (db) {
+                const q = query(collection(db, `/artifacts/${appId}/public/data/fiscalizaciones`));
+                try {
+                    const querySnapshot = await getDocs(q);
+                    let html = '<h2 class="text-2xl font-bold mb-4">Fiscalizaciones Recientes</h2>';
+                    html += '<ul class="space-y-4">';
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const formattedDate = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : 'N/A';
+                        html += `
+                            <li class="p-4 bg-gray-100 rounded-lg shadow-sm">
+                                <p><strong>Fecha:</strong> ${formattedDate}</p>
+                                <p><strong>Lugar:</strong> ${data.lugar}</p>
+                                <p><strong>Agente:</strong> ${data.agente}</p>
+                                <p><strong>Infracción:</strong> ${data.infraccion}</p>
+                                <p><strong>Descripción:</strong> ${data.descripcion}</p>
+                                <p class="text-xs text-gray-500 mt-2">ID de Documento: ${doc.id}</p>
+                                <p class="text-xs text-gray-500">ID de Usuario: ${data.userId}</p>
+                            </li>
+                        `;
+                    });
+                    html += '</ul>';
+                    fiscalizacionesContainer.innerHTML = html;
+                } catch (error) {
+                    console.error("Error al cargar fiscalizaciones:", error);
+                    fiscalizacionesContainer.innerHTML = 'Error al cargar las fiscalizaciones. Intenta recargar la página.';
+                }
+            } else {
+                fiscalizacionesContainer.innerHTML = '<h2 class="text-2xl font-bold mb-4">Fiscalizaciones Recientes</h2><p>Las fiscalizaciones solo se mostrarán cuando la aplicación se conecte a Firebase.</p>';
             }
         }
 
         // Función para cerrar sesión
         function handleLogout() {
-            auth.signOut();
+            if (auth) {
+                auth.signOut();
+            }
             displayMessage('Has cerrado sesión.', 'info');
             showView('login-view');
         }
